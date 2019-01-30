@@ -14,7 +14,7 @@ t(1) = 0;
 % bd(:,1)=[0.4*sin(pi*0);0.6*cos(pi*0);0.4*0];
 % vd(:,1)=[0.4*pi*cos(pi*0);-0.6*pi*sin(pi*0);0.4];
 % dvd(:,1)=[-0.4*pi^2*sin(pi*0);-0.6*pi^2*cos(pi*0);0];
-bd(:,1)=[0.9999;0.01;0.002];
+bd(:,1)=[0.09999;0.01;0];
 % bd(:,1)=[-1.2;0.01;0.002]; %for cosine traj
 vd(:,1)=[0;0;0];
 dvd(:,1)=[0;0;0];
@@ -23,9 +23,9 @@ dvd(:,1)=[0;0;0];
 bt(:,1) = b0-bd(:,1); % initial position error
 vt(:,1) = R(:,:,1)*nu(:,1)-vd(:,1); % initial velocity error
 
-Rd(:,:,1) = desired_attitude_dot(bt(:,1),vt(:,1),dvd(:,1)); % initial desired attitude
-
-bd_1=[0.01;0.01;0.01];
+% Rd(:,:,1) = desired_attitude_dot(bt(:,1),vt(:,1),dvd(:,1)); % initial desired attitude
+Rd(:,:,1) = [-0.8487   0   -0.5288;0.4197    0.6083   -0.6736; 0.3217   -0.7937   -0.5163 ];
+bd_1=[0.01;0.01;0];
 vd_1=[0;0;0];
 dvd_1=[0;0;0];
 

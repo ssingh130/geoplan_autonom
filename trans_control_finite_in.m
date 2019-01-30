@@ -14,7 +14,6 @@ dz=(((bt'*bt)^(1-1/pt))*...
 
 L=(kt*Pr*(vt+kt*z))/((vt+kt*z)'*Pr*(vt+kt*z))^(1-(1/pt));
 
-%f=e3'*R'*(m*(g*e3+dvd+kt*dz+kt*bt+((kt*Pr*(vt+kt*z))/((vt+kt*z)'*Pr*(vt+kt*z))^(1-1/p))));
 f=e3'*R'*(m*(g*e3-dvd+kt*dz+kt*bt+L));
 %f = e3'*R'*(m*g*e3+P*bt+L*(R*nu-vd)-m*dvd);
 %f=m*g*e3+P*bt+L*(R*nu-vd)-m*dvd;
