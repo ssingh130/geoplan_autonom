@@ -1,7 +1,7 @@
 function [t,R,Rd,b,fm,tau,tau1,tau2,tau3,tau4,nu,Omd,dOmd,Om,Q,ydes,vdes,dvd,bt,vt] = LGVI_SE3_UAV(b0,R0,nu0,Om0,dvd0,t0,tf,h)
 
 global J M m e3 g
-
+%% Variables
 b(:,1) = b0;
 R(:,:,1) = R0;
 nu(:,1) = nu0;
@@ -10,12 +10,8 @@ Delt = tf-t0;
 n = fix(Delt/h);
 
 t(1) = 0;
- 
-% bd(:,1)=[0.4*sin(pi*0);0.6*cos(pi*0);0.4*0];
-% vd(:,1)=[0.4*pi*cos(pi*0);-0.6*pi*sin(pi*0);0.4];
-% dvd(:,1)=[-0.4*pi^2*sin(pi*0);-0.6*pi^2*cos(pi*0);0];
-bd(:,1)=[0.09999;0.01;0];
-% bd(:,1)=[-1.2;0.01;0.002]; %for cosine traj
+%bd(:,1)=[0.09999;0.01;0];
+bd(:,1)=[1;0.01;0]; %for cosine traj
 vd(:,1)=[0;0;0];
 dvd(:,1)=[0;0;0];
 
@@ -23,47 +19,30 @@ dvd(:,1)=[0;0;0];
 bt(:,1) = b0-bd(:,1); % initial position error
 vt(:,1) = R(:,:,1)*nu(:,1)-vd(:,1); % initial velocity error
 
-% Rd(:,:,1) = desired_attitude_dot(bt(:,1),vt(:,1),dvd(:,1)); % initial desired attitude
+%Rd(:,:,1) = desired_attitude_dot(bt(:,1),vt(:,1),dvd(:,1)); % initial desired attitude
 Rd(:,:,1) = [-0.8487   0   -0.5288;0.4197    0.6083   -0.6736; 0.3217   -0.7937   -0.5163 ];
 bd_1=[0.01;0.01;0];
 vd_1=[0;0;0];
 dvd_1=[0;0;0];
-
 Omd(:,1) = Om0;
+
 for j=1:15
     
     for k=1:n-1 
     t(k+1)=t(k)+h;    
-    
-%     bd(:,k+1)=[0.4*sin(pi*t(k+1));0.6*cos(pi*t(k+1));0.4*t(k+1)];
-%     vd(:,k+1)=[0.4*pi*cos(pi*t(k+1));-0.6*pi*sin(pi*t(k+1));0.4];
-%     dvd(:,k+1)=[-0.4*pi^2*sin(pi*t(k+1));-0.6*pi^2*cos(pi*t(k+1));0];
 
-%     bd(:,k+1)=[cos(t(k+1))./(1+sin(t(k+1)).^2);cos(t(k+1)).*sin(t(k+1))./(1+sin(t(k+1)).^2);0.2*t(k+1)];
-%     vd(:,k+1)=(1/h)*(bd(:,k+1)-bd(:,k));
-%     dvd(:,k+1)=(1/h)*(vd(:,k+1)-vd(:,k));
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-   %Sine trajectroy
-    bd(:,k+1)=[12.*sin(0.25*pi*t(k+1));12.*t(k+1);30];
-    vd(:,k+1)=[12*0.25.*pi.*cos(0.25*pi*t(k+1));12;0];
-    dvd(:,k+1)=[-12*0.25^2.*pi.^2.*sin(0.25*pi*t(k+1));0;0];
+   %% Sine trajectroy
+    bd(:,k+1)=[12.*cos(0.25*pi*t(k+1));12.*t(k+1);12*t(k+1)];
+    vd(:,k+1)=[-12*0.25.*pi.*sin(0.25*pi*t(k+1));12;12];
+    dvd(:,k+1)=[-12*0.25^2.*pi.^2.*cos(0.25*pi*t(k+1));0;0];
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     Cosine Trajectory just to change the initial starting point
 %      bd(:,k+1)=[1.2.*cos(0.25*pi*t(k+1));1.2.*t(k+1);30];
 %      vd(:,k+1)=[-1.2*0.25.*pi.*sin(0.25*pi*t(k+1));1.2;0];
 %      dvd(:,k+1)=[-1.2*0.25^2.*pi.^2.*cos(0.25*pi*t(k+1));0;0];
-
-%     HAver sine function applied to the trajectory
-%     bd(:,k+1)=;
-%     vd(:,k+1)=[0.8.*pi.*cos(pi*t(k+1));0.8;0];
-%     dvd(:,k+1)=[-0.8.*pi.^2.*sin(pi*t(k+1));0;0];
-
-% a simple trajectory for checking the gains
-% bd(:,k+1)=[t(k+1);2*t(k+1);t(k+1)];
-% vd(:,k+1)=(1/h)*(bd(:,k+1)-bd(:,k));
-% dvd(:,k+1)=(1/h)*(vd(:,k+1)-vd(:,k));
-
+%% Initial Calculations
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fi = h*Om(:,k);
     F(:,:,k) = expmso3(fi);
@@ -71,8 +50,11 @@ for j=1:15
     
     R(:,:,k+1) = R(:,:,k)*F(:,:,k);       % next attitude
     b(:,k+1) = h*R(:,:,k)*nu(:,k)+b(:,k); % the next position
+
+    %% Command Governor application section
     
-    %gains for ref gov
+    % new commmand governor needs to be implemented to reduce the gains tht
+    % we have
     
     n = length(b0);
     L = size(bd,2);
@@ -99,7 +81,7 @@ for j=1:15
         vdes(:,1)=vd(:,1); % initial output reference from governor
 
 % Governor gains
-        Lv=0.98*eye(a); 
+        Lv=0.9*eye(a); 
         gam1=0.06;
         p1=9/8;
         ep1 = 1-1/p1;
@@ -111,6 +93,7 @@ for j=1:15
             Edkp1=Bcal*Edk+0.03;
             vdes(:,ks+1)=vd(:,k+1)+Edkp1;
         end
+     %% Controller Inputs  
     % The control torque:
     bt(:,k+1)=b(:,k+1) - ydes(:,k+1);
     
@@ -139,6 +122,8 @@ for j=1:15
         
     Om(:,:,k+1) = J\((F(:,:,k)'*J*Om(:,:,k))+h*tau(:,k));
     end
+    
+    %% Initialization of values
     b_1 = v(:,2)*h*0.5; 
     v_1 = v(:,3)*0.5 - 2*v(:,2); 
     bt_1 = b_1 - bd_1; 

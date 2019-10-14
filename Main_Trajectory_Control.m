@@ -6,7 +6,7 @@ tc=cputime;
 global J m M e1 e2 e3 Pr La g p ki kp pt kt
 
 h=.01;                                 % Step size
-tf=40;                                 % Final time for simulation
+tf=30;                                 % Final time for simulation
 t0=0;
 e1=[1;0;0];e2=[0;1;0];e3=[0;0;1];
     
@@ -30,15 +30,15 @@ dvd0=[0;0;0];                           % initial desired translational accelera
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Gains for the sine trajectory
-kt = 0.78;%less than 1 always
-Pr = eye(3);
-pt = 1.2;
-
+% kt = 0.75;%less than 1 always
+% Pr = eye(3);
+% pt = 1.2;
+% 
 % Attitude Gain
-La = 0.025*eye(3); % lower the better for trq
-p  = 1.15; % 1.1; p>1
-ki = 3.4;
-kp = 0.01;
+% La = 0.025*eye(3); % lower the better for trq
+% p  = 1.15; % 1.1; p>1
+% ki = 3.4;
+% kp = 0.01;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %new gains modified by somesh for sine trajectory for 1200 m distance range
 % kt = 0.95;%less than 1 always
@@ -51,16 +51,16 @@ kp = 0.01;
 % ki = 3.35;
 % kp = 0.01;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %gains for cosine trajectory
-% kt = 0.8;%less than 1 always
-% Pr = 32*eye(3);
-% pt = 1.1;
+%gains for cosine trajectory
+kt = 0.25;%less than 1 always
+Pr = 22*eye(3);
+pt = 1.0;
 % 
 % % Attitude Gain
-% La = 0.05*eye(3); % lower the better for trq
-% p  = 1.2; % 1.1; p>1
-% ki = 3.25;
-% kp = 0.01;
+La = 0.015*eye(3); % lower the better for trq
+p  = 1.3; % 1.1; p>1
+ki = 3.25;
+kp = 0.01;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [t,R,Rd,b,fm,tau,tau1,tau2,tau3,tau4,nu,Omd,dOmd,Om,Q,bd,vd,dvd,bt,vt] = LGVI_SE3_UAV(b0,R0,nu0,Om0,dvd0,t0,tf,h);
 
